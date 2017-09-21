@@ -13,12 +13,15 @@ func Start(stateMachine fsm.StateMachine, startState string) {
 	emitter := &CommandLineEmitter{}
 
 	// Create Traverser
-	traverser := &CachedTraverser{}
+	traverser := &CachedTraverser{
+		Data: make(map[string]interface{}, 0),
+	}
 	traverser.SetCurrentState(startState)
 	traverser.SetUUID("CLI-USER")
 
 	// Get Start State
 	currentState := stateMachine[startState](emitter, traverser)
+	currentState.EntryAction()
 
 	// Prep Reader
 	reader := bufio.NewReader(os.Stdin)
@@ -29,6 +32,7 @@ func Start(stateMachine fsm.StateMachine, startState string) {
 		text = text[:len(text)-1]
 
 		// Pass Input to State
+		currentState = stateMachine[traverser.CurrentState()](emitter, traverser)
 		newState := currentState.Transition(text)
 		newState.EntryAction()
 		currentState = newState
