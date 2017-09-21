@@ -27,7 +27,6 @@ func Start(stateMachine fsm.StateMachine, startState string) {
 		fmt.Print("-> ")
 		text, _ := reader.ReadString('\n')
 		text = text[:len(text)-1]
-		fmt.Println(text)
 
 		// Pass Input to State
 		newState := currentState.Transition(text)
